@@ -4,7 +4,9 @@
 ; ========================================
 
 #define MyAppName "NakTaWallpaper"
-#define MyAppVersion "1.0.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "1.0.0"
+#endif
 #define MyAppPublisher "NakTa"
 #define MyAppExeName "NakTaWallpaper.exe"
 
@@ -17,7 +19,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-OutputDir=C:\wallpaperengine\NakTaWallpaper\dist
+OutputDir=dist
 OutputBaseFilename=NakTaWallpaper-Setup-v{#MyAppVersion}
 Compression=lzma2/ultra
 SolidCompression=yes
@@ -41,7 +43,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "startupicon"; Description: "Windows 시작 시 자동 실행"; GroupDescription: "추가 설정:"; Flags: checkedonce
 
 [Files]
-Source: "C:\wallpaperengine\NakTaWallpaper\dist\NakTaWallpaper\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\NakTaWallpaper\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

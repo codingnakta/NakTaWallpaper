@@ -127,6 +127,9 @@ public partial class MainWindow : Window
         // Chrome 입력 핸들 찾기 (WebView2 안의 자식 윈도우 트리에서)
         await Task.Delay(600);
         _webViewInputHandle = FindChromeInputHwnd(hwnd);
+
+        // 백그라운드에서 업데이트 확인 (실패해도 조용히 무시)
+        _ = UpdaterService.CheckForUpdateAsync();
     }
 
     // === Lively 방식 desktop 부착 ===
