@@ -122,6 +122,15 @@ public partial class MainWindow : Window
             "NakTaWallpaper", "WebView2Data");
         var env = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
         await webView.EnsureCoreWebView2Async(env);
+
+        // 페이지가 새 창을 요청하면 (target="_blank", window.open 등)
+        // WebView2 기본 동작 막고 크롬으로 열기 → 없으면 기본 브라우저로 fallback
+        webView.CoreWebView2.NewWindowRequested += (s, e) =>
+        {
+            e.Handled = true;
+            OpenExternal(e.Uri);
+        };
+
         webView.CoreWebView2.Navigate("https://www.naver.com");
 
         // Chrome 입력 핸들 찾기 (WebView2 안의 자식 윈도우 트리에서)
@@ -138,6 +147,61 @@ public partial class MainWindow : Window
     // 3. raised desktop이면 우리 윈도우를 Progman의 자식 + WS_EX_LAYERED + SHELLDLL_DefView 바로 뒤
     // 4. 일반이면 WorkerW의 자식
     // 5. SHELLDLL_DefView는 절대 안 건드림
+    // 외부 URL을 크롬으로 열고, 크롬이 없으면 시스템 기본 브라우저로 fallback
+    private static void OpenExternal(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return;
+
+        // 1) 크롬 표준 설치 경로 후보
+        string[] chromePaths =
+        {
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                "Google", "Chrome", "Application", "chrome.exe"),
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                "Google", "Chrome", "Application", "chrome.exe"),
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Google", "Chrome", "Application", "chrome.exe"),
+        };
+
+        foreach (var path in chromePaths)
+        {
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = path,
+                        Arguments = "\"" + url + "\"",
+                        UseShellExecute = false
+                    });
+                    return;
+                }
+                catch
+                {
+                    // 다음 후보 시도
+                }
+            }
+        }
+
+        // 2) 크롬 없으면 시스템 기본 브라우저 (Edge 일 수도, 다른 거 일 수도)
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // 둘 다 실패면 조용히 무시
+        }
+    }
+
     private void AttachToDesktop(IntPtr hwnd)
     {
         _progmanHandle = FindWindow("Progman", null);
