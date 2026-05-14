@@ -82,11 +82,18 @@ public static class UpdaterService
                 await src.CopyToAsync(dst);
             }
 
+            // 완전 자동 설치 모드:
+            //  /VERYSILENT          UI 전혀 안 띄움
+            //  /SUPPRESSMSGBOXES    설치 중 메시지박스 자동 OK
+            //  /NORESTART           재부팅 안 함
+            //  /CLOSEAPPLICATIONS   실행 중인 앱(현재 앱 포함) 자동 종료
+            //  /RESTARTAPPLICATIONS 설치 끝나면 자동 재실행
             Process.Start(new ProcessStartInfo
             {
                 FileName = tempPath,
+                Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS",
                 UseShellExecute = true,
-                Verb = "runas" // 인스톨러는 관리자 권한 필요
+                Verb = "runas" // 관리자 권한 (UAC 한 번만)
             });
 
             System.Windows.Application.Current.Shutdown();
