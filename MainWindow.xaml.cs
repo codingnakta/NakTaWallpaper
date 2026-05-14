@@ -317,7 +317,30 @@ public partial class MainWindow : Window
             return CallNextHookEx(_mouseHook, nCode, wParam, lParam);
         }
 
-        if (msg is WmLbuttondown or WmLbuttonup or WmRbuttondown or WmRbuttonup or WmMousewheel)
+        // 휠은 별도 처리: Chromium의 비동기 입력 파이프라인이 PostMessage 휠을
+        // 무시하는 케이스가 많아 JavaScript로 직접 scrollBy 호출
+        if (msg == WmMousewheel)
+        {
+            var hs = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
+            if (IsDesktopArea(hs.pt))
+            {
+                short delta = unchecked((short)(hs.mouseData >> 16));
+                int scrollY = -delta; // 휠 forward(+)면 위로 스크롤(-)
+
+                Dispatcher.BeginInvoke(() =>
+                {
+                    try
+                    {
+                        webView?.CoreWebView2?.ExecuteScriptAsync(
+                            $"window.scrollBy({{top:{scrollY},left:0,behavior:'auto'}})");
+                    }
+                    catch { }
+                });
+                return new IntPtr(1);
+            }
+        }
+
+        if (msg is WmLbuttondown or WmLbuttonup or WmRbuttondown or WmRbuttonup)
         {
             var hs = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
             if (IsDesktopArea(hs.pt))
@@ -328,12 +351,6 @@ public partial class MainWindow : Window
                     WmRbuttondown or WmRbuttonup => MkRbutton,
                     _ => IntPtr.Zero
                 };
-
-                if (msg == WmMousewheel)
-                {
-                    // wheel은 wParam에 휠 delta + 키 상태
-                    wparam = (IntPtr)unchecked((int)(hs.mouseData & 0xFFFF0000));
-                }
 
                 ForwardMouse(msg, hs.pt, wparam);
                 return new IntPtr(1);
@@ -365,20 +382,7 @@ public partial class MainWindow : Window
         POINT pt = screenPt;
         ScreenToClient(_webViewInputHandle, ref pt);
 
-        uint lp = (uint)((pt.y << 16) | (pt.x & 0xFFFF));
-        IntPtr lParam;
-
-        if (msg == WmMousewheel)
-        {
-            // 휠은 lParam이 screen 좌표
-            uint screenLp = (uint)((screenPt.y << 16) | (screenPt.x & 0xFFFF));
-            lParam = (IntPtr)screenLp;
-        }
-        else
-        {
-            lParam = (IntPtr)lp;
-        }
-
+        IntPtr lParam = (IntPtr)((pt.y << 16) | (pt.x & 0xFFFF));
         PostMessage(_webViewInputHandle, (uint)msg, wParam, lParam);
     }
 
