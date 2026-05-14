@@ -122,7 +122,7 @@ public partial class MainWindow : Window
             "NakTaWallpaper", "WebView2Data");
         var env = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
         await webView.EnsureCoreWebView2Async(env);
-        webView.CoreWebView2.Navigate("https://www.google.com");
+        webView.CoreWebView2.Navigate("https://www.naver.com");
 
         // Chrome 입력 핸들 찾기 (WebView2 안의 자식 윈도우 트리에서)
         await Task.Delay(600);
