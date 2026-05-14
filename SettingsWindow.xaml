@@ -1,0 +1,38 @@
+<Window x:Class="NakTaWallpaper.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings"
+        Width="360"
+        Height="240"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#FFF9F1FF">
+    <Border Margin="18"
+            Background="#FCF8FF"
+            BorderBrush="#D9C6F3"
+            BorderThickness="1"
+            CornerRadius="16"
+            Padding="22">
+        <StackPanel>
+            <TextBlock Text="Settings"
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       Foreground="#352C42" />
+            <TextBlock Margin="0,16,0,0"
+                       Text="Native WPF controls only. No WebView2, browser profile, cookies, or session storage are used in this PoC."
+                       TextWrapping="Wrap"
+                       Foreground="#5E516E"
+                       FontSize="15" />
+            <CheckBox Margin="0,20,0,0"
+                      Content="Keep overlay widget visible"
+                      IsChecked="True"
+                      Foreground="#4B3D5C" />
+            <Button Margin="0,24,0,0"
+                    Width="96"
+                    Height="34"
+                    HorizontalAlignment="Right"
+                    Content="Close"
+                    Click="CloseButton_Click" />
+        </StackPanel>
+    </Border>
+</Window>

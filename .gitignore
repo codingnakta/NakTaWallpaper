@@ -1,0 +1,40 @@
+# Build outputs
+bin/
+obj/
+publish/
+dist/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# WebView2 user data
+WebView2Data/
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editor / tool local config
+.claude/
+
+# Misc
+*.pdb
+*.tlog
+*.cache
+
+# Inno Setup intermediate (keep the .iss script)
+Output/
