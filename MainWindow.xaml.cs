@@ -131,7 +131,7 @@ public partial class MainWindow : Window
             OpenExternal(e.Uri);
         };
 
-        webView.CoreWebView2.Navigate("https://www.naver.com");
+        webView.CoreWebView2.Navigate("http://localhost:5173/");
 
         // Chrome 입력 핸들 찾기 (WebView2 안의 자식 윈도우 트리에서)
         await Task.Delay(600);
